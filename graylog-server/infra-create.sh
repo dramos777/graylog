@@ -23,13 +23,11 @@ INITREPLSETJS="init-replset.js"
 # Graylog variables
 GRAYLOGSRV1="graylog1"
 GRAYLOGSRV2="graylog2"
-GRAYLOGSRV1PORT="9000"
-GRAYLOGSRV2PORT="9001"
 
 # Functions
 # Create certs function
 Cert_and_dhparam_create() {
-    # Generate private key and signed certificate
+    # Generate private key and testened certificate
     if openssl req -newkey rsa:2048 -nodes -keyout "certs/${KEYNAME}" -x509 -days "${VALID}" -out "certs/${CERTNAME}"; then
         echo "Chave privada e certificado autoassinado gerados com sucesso."
     else
@@ -45,7 +43,7 @@ Cert_and_dhparam_create() {
         return 1
     fi
 
-    # Sign the intermediate certificate with self signed certificate
+    # Sign the intermediate certificate with self testened certificate
     if openssl x509 -req -days "${VALID}" -in "certs/${INTERMEDIATE_REQ}" -CA "certs/${CERTNAME}" -CAkey "certs/${KEYNAME}" -CAcreateserial -out "certs/${INTERMEDIATE_CERT}"; then
         echo "Certificado intermediário assinado com sucesso."
     else
@@ -53,7 +51,7 @@ Cert_and_dhparam_create() {
         return 1
     fi
 
-    # Generate chain.pem file concatenating certificate self signed and intermediate certificate
+    # Generate chain.pem file concatenating certificate self testened and intermediate certificate
     if cat "certs/${CERTNAME}" "certs/${INTERMEDIATE_CERT}" > "certs/${CHAIN}"; then
         echo "Arquivo chain.pem criado com sucesso."
     else
