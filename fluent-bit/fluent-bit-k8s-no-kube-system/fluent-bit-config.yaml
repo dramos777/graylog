@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: kube-system
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush        1
+        Log_Level    info
+
+    [INPUT]
+        Name         tail
+        Exclude_Path /var/log/containers/*_kube-system_*,/var/log/containers/*_keda_*,/var/log/containers/*_amazon-cloudwatch_*
+        Path         /var/log/containers/*.log
+        Parser       docker
+        Tag          kube.*
+
+    [FILTER]
+        Name         kubernetes
+        Match        kube.*
+        Kube_URL     https://kubernetes.default.svc:443
+        Merge_Log    On
+
+    [OUTPUT]
+        Name         gelf
+        Match        *
+        Host         your_graylog_server_ip
+        Port         12201
+        Gelf_Short_Message_Key log
+        Gelf_Full_Message_Key log
+        Gelf_Level_Key level
+        #        Gelf_Facility kube-fluent-bit
+
+  parsers.conf: |
+    [PARSER]
+        Name   docker
+        Format json
+        Time_Key time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+        Time_Keep On
+        Decode_Field_As   escaped_utf8    log
+        Decode_Field_As   escaped         log
+
