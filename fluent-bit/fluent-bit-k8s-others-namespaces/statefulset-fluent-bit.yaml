@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+ name: my-app
+ namespace: default
+ labels:
+   app: my-app
+spec:
+ serviceName: "my-app"
+ replicas: 2
+ selector:
+  matchLabels:
+    app: my-app
+ template:
+  metadata:
+   labels:
+    app: my-app
+  spec:
+   containers:
+    - name: fluent-bit
+      image: fluent/fluent-bit:latest
+      resources:
+        limits:
+          memory: 200Mi
+          cpu: 100m
+        requests:
+          memory: 100Mi
+          cpu: 100m
+      volumeMounts:
+         - mountPath: /var/log/
+           name: my-app-log
+         - mountPath: /var/container-state/
+           name: state-fluentbit-db
+         - mountPath: /fluent-bit/scripts/
+           name: fluent-bit-filter-lua
+         - mountPath: /fluent-bit/etc/
+           name: fluent-bit-config
+           readOnly: true
+   volumes:
+    - name: my-app-log
+      emptyDir: {}
+    - name: state-fluentbit-db
+      emptyDir: {}
+    - name: fluent-bit-config
+      configMap:
+         name: fluent-bit-config
+    - name: fluent-bit-filter-lua
+      configMap:
+         name: fluent-bit-filter-lua
+    - name: tz-my-app
+      hostPath:
+         path: /usr/share/zoneinfo/America/Fortaleza
+         type: File
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app
+spec:
+  selector:
+    app: my-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 32000
+  type: NodePort
+
