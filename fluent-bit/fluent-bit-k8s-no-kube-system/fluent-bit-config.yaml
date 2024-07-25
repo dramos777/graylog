@@ -22,6 +22,11 @@ data:
         Kube_URL     https://kubernetes.default.svc:443
         Merge_Log    On
 
+    [FILTER]
+        Name   record_modifier
+        Match  *
+        Record source ${HOSTNAME}
+
     [OUTPUT]
         Name         gelf
         Match        *
