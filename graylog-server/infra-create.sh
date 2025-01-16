@@ -117,7 +117,7 @@ http {
     ssl_stapling           on;
     ssl_stapling_verify    on;
 
-    resolver 172.18.11.2 valid=300s;
+    resolver 8.8.8.8 valid=300s;
     resolver_timeout 5s;
 
 # Disable strict transport security for now. You can uncomment the following
