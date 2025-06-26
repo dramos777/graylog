@@ -40,6 +40,12 @@ Finally, start the containers with compose and list them:
 docker compose up -d
 docker container ls
 ```
+## Troubleshooting
+Remove deflector
+```
+# In the web interface, look up the deflector index and then delete it
+curl -XDELETE http://localhost:9200/gl-system-events_deflector
+```
 
 ### Maintainer
 
